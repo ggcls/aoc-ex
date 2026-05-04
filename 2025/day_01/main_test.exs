@@ -21,6 +21,6 @@ L82"
   end
 
   test "part2" do
-    assert Main.part2(@example) == 0
+    assert Main.part2(@example) == 6
   end
 end

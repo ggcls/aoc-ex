@@ -64,10 +64,44 @@ defmodule Main do
     |> elem(1)
   end
 
+  def rotate_and_count_zeros(position, <<direction::binary-size(1), distance::binary>>) do
+    distance = String.to_integer(distance)
+
+    # Convert direction into a step:
+    # R = +1, L = -1
+    steps =
+      case direction do
+        "R" -> 1
+        "L" -> -1
+      end
+
+    # Simulate each click one by one
+    Enum.reduce(1..distance, {position, 0}, fn _step, {current_position, count} ->
+      # Move one step and wrap around the dial (0..99)
+      new_position = Integer.mod(current_position + steps, 100)
+
+      new_count =
+        if new_position == 0 do
+          count + 1
+        else
+          count
+        end
+
+      {new_position, new_count}
+    end)
+  end
+
   def part2(input) do
     input
     |> parse_input()
-    |> length()
+    # We keep:
+    # - current position
+    # - total number of times we hit 0
+    |> Enum.reduce({50, 0}, fn rotation, {position, count} ->
+      {new_position, zeros_hit} = rotate_and_count_zeros(position, rotation)
+      {new_position, count + zeros_hit}
+    end)
+    |> elem(1)
   end
 
   def parse_input(input) do
