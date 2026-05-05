@@ -38,7 +38,8 @@ defmodule Main do
   def part2(input) do
     input
     |> parse_input()
-    |> length()
+    |> Enum.map(&find_voltage(&1, 12))
+    |> Enum.sum()
   end
 
   def parse_input(input) do
