@@ -48,4 +48,6 @@ defmodule Main do
   end
 end
 
-Main.main(System.argv())
+unless Process.whereis(ExUnit.Server) do
+  Main.main(System.argv())
+end
