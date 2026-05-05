@@ -19,6 +19,6 @@ defmodule AocEx.Year2025.Day04Test do
   end
 
   test "part2" do
-    assert Day04.part2(@example) == 0
+    assert Day04.part2(@example) == 43
   end
 end
