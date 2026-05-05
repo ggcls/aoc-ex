@@ -49,8 +49,16 @@ defmodule Main do
     |> Enum.sum()
   end
 
-  def part2(_input) do
-    0
+  def part2(input) do
+    ranges = parse_input(input)
+
+    # Part two accepts the same pattern repeated any number of times, as long
+    # as it is repeated at least twice.
+    ranges
+    |> max_range_id()
+    |> ids_repeated_at_least_twice_up_to()
+    |> Enum.filter(&inside_any_range?(&1, ranges))
+    |> Enum.sum()
   end
 
   def parse_input(input) do
@@ -86,24 +94,51 @@ defmodule Main do
       |> div(2)
 
     1..max_half_length
-    |> Enum.flat_map(&invalid_ids_with_half_length(&1, max_id))
+    |> Enum.flat_map(&ids_with_pattern_length(&1, 2, max_id))
   end
 
-  defp invalid_ids_with_half_length(half_length, max_id) do
-    scale = pow10(half_length)
+  defp ids_repeated_at_least_twice_up_to(max_id) when max_id < 11, do: []
+
+  defp ids_repeated_at_least_twice_up_to(max_id) do
+    # We only need to generate invalid IDs up to the largest range endpoint.
+    max_digits =
+      max_id
+      |> Integer.to_string()
+      |> String.length()
+
+    # The repeated pattern must appear at least twice, so its length can be at
+    # most half of the final ID length.
+    1..div(max_digits, 2)
+    |> Enum.flat_map(fn pattern_length ->
+      max_repetitions = div(max_digits, pattern_length)
+
+      2..max_repetitions
+      |> Enum.flat_map(fn repetitions ->
+        ids_with_pattern_length(pattern_length, repetitions, max_id)
+      end)
+    end)
+    # Some IDs match the rule in multiple ways, like 1111 = 1x4 and 11x2.
+    |> Enum.uniq()
+  end
+
+  defp ids_with_pattern_length(pattern_length, repetitions, max_id) do
+    scale = pow10(pattern_length)
     # Prefixes cannot start with zero because product IDs have no leading zeroes.
     first_prefix = div(scale, 10)
     last_prefix = scale - 1
 
     first_prefix..last_prefix
-    |> Stream.map(&repeat_digits_twice/1)
+    |> Stream.map(&repeat_digits(&1, repetitions))
     |> Enum.take_while(&(&1 <= max_id))
   end
 
-  defp repeat_digits_twice(prefix) do
-    # Example: 123 becomes 123123.
+  defp repeat_digits(prefix, repetitions) do
+    # Example: repeating 123 three times gives 123123123.
     digits = Integer.to_string(prefix)
-    String.to_integer(digits <> digits)
+
+    digits
+    |> String.duplicate(repetitions)
+    |> String.to_integer()
   end
 
   defp inside_any_range?(id, ranges) do

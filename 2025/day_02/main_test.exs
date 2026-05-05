@@ -14,6 +14,6 @@ defmodule MainTest do
   end
 
   test "part2" do
-    assert Main.part2(@example) == 0
+    assert Main.part2(@example) == 4_174_379_265
   end
 end
