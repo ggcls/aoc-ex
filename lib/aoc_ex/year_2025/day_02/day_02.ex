@@ -1,41 +1,11 @@
-defmodule Main do
-  @input_path Path.join(__DIR__, "input.txt")
+defmodule AocEx.Year2025.Day02 do
+  alias AocEx.InputUtils
+  alias AocEx.SolutionRunner
 
-  def main(args) do
-    {opts, _rest, _invalid} =
-      OptionParser.parse(args,
-        switches: [part: :integer],
-        aliases: [p: :part]
-      )
+  @year 2025
+  @day 2
 
-    part = Keyword.get(opts, :part, 1)
-
-    IO.puts("Running part #{part}")
-
-    input = read_input!()
-
-    output =
-      case part do
-        1 -> part1(input)
-        2 -> part2(input)
-        _ -> raise "part must be 1 or 2"
-      end
-
-    IO.puts("Output: #{output}")
-  end
-
-  def read_input! do
-    input =
-      @input_path
-      |> File.read!()
-      |> String.trim_trailing("\n")
-
-    if input == "" do
-      raise "empty input.txt file"
-    end
-
-    input
-  end
+  def main(args), do: SolutionRunner.run(__MODULE__, @year, @day, args)
 
   def part1(input) do
     ranges = parse_input(input)
@@ -63,8 +33,7 @@ defmodule Main do
 
   def parse_input(input) do
     input
-    |> String.replace("\r", "")
-    |> String.trim()
+    |> InputUtils.normalize()
     |> String.split(",", trim: true)
     |> Enum.map(fn range ->
       [first, last] =
@@ -150,8 +119,4 @@ defmodule Main do
   defp pow10(power) do
     Enum.reduce(1..power, 1, fn _step, total -> total * 10 end)
   end
-end
-
-unless Process.whereis(ExUnit.Server) do
-  Main.main(System.argv())
 end

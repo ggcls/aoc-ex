@@ -1,4 +1,6 @@
 .vscode/*
+_build/
+deps/
 input*.txt
 .DS_Store
 
